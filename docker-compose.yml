@@ -1,0 +1,19 @@
+services:
+  backend:
+    build: ./backend
+    container_name: backend
+    environment:
+      - TRACKER_DATA_DIR=/app/data
+      - PORT=8080
+    volumes:
+      - D:\tracker-system\Tracker:/app/data
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
