@@ -835,15 +835,6 @@ app.get("/api/export", async (req, res) => {
   }
 });
 
-// ---------------------------------------------------------------
-// Static frontend
-// ---------------------------------------------------------------
-app.use(express.static(path.join(__dirname, "..", "frontend")));
-
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "frontend", "index.html"));
-});
-
 ensureDirs();
 
 const PORT = process.env.PORT || 3000;
