@@ -1,0 +1,39 @@
+# =============================================================
+# Dependencies — reinstalled from package.json via `npm install`,
+# never committed. Regenerating these is fast; storing them bloats
+# the repo with thousands of third-party files that aren't "our" code.
+# =============================================================
+node_modules/
+
+# =============================================================
+# Environment / secrets — .env holds machine-specific config
+# (e.g. TRACKER_DATA_DIR, PORT). Never commit real secrets; only
+# .env.example (a template with no real values) is tracked.
+# =============================================================
+.env
+.env.local
+
+# =============================================================
+# Personal data — THIS IS THE MOST IMPORTANT LINE IN THIS FILE.
+# The actual data directory (D:\tracker-system\Tracker) must never
+# enter Git history: it holds real financial figures and personal
+# logs. If the data folder ever lives *inside* the repo folder by
+# accident, this pattern keeps it out regardless of exact path.
+# =============================================================
+Tracker/
+**/Tracker/
+*.data/
+
+# =============================================================
+# OS / editor noise — machine-specific files with zero project value.
+# =============================================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =============================================================
+# Logs — runtime output, not source code.
+# =============================================================
+*.log
+npm-debug.log*

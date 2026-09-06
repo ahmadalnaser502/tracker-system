@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>السجل الشخصي — Personal Development System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("tracker_theme");
+      document.documentElement.setAttribute("data-theme", t === "light" ? "light" : "dark");
+    } catch (e) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+  })();
+</script>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============================================================
+       SIDEBAR — identity, nav, connection status
+  ============================================================ -->
+  <aside class="sidebar">
+    <div class="sidebar-mark">
+      <span class="sidebar-mark-glyph">&gt;_</span>
+      <span class="sidebar-mark-text">السجل</span>
+    </div>
+
+    <nav class="pagenav" aria-label="التنقل بين الصفحات">
+      <button class="pagenav-btn active" data-page="tracking">
+        <span class="pagenav-num">01</span>
+        <span class="pagenav-label">المتابعة</span>
+      </button>
+      <button class="pagenav-btn" data-page="finance">
+        <span class="pagenav-num">02</span>
+        <span class="pagenav-label">المالية</span>
+      </button>
+    </nav>
+
+    <div class="conn-status" id="connStatus">
+      <span class="dot" id="connDot"></span>
+      <span id="connLabel">يتصل بالسيرفر…</span>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" type="button" title="تبديل الوضع الفاتح/الداكن">
+      <span class="theme-toggle-icon" id="themeToggleIcon">☾</span>
+      <span id="themeToggleLabel">داكن</span>
+    </button>
+  </aside>
+
+  <div class="scaffold">
+
+
+  <!-- ============================================================
+       SECTION 1 — المتابعة (Tracking): 3 sub-tabs
+  ============================================================ -->
+  <main class="page active" id="page-tracking">
+
+    <nav class="subtabs" aria-label="تبويبات المتابعة" data-group="tracking">
+      <button class="subtab-btn active" data-subtab="log">متابعة اليوم</button>
+      <button class="subtab-btn" data-subtab="plan">خطة الأسبوع</button>
+      <button class="subtab-btn" data-subtab="dashboard">لوحة الأسبوع</button>
+    </nav>
+
+    <!-- ===================== SUBTAB: DAILY LOG ===================== -->
+    <section class="subtab-panel active" id="subtab-log" data-group="tracking">
+
+    <div class="log-datebar">
+      <button class="datebar-arrow" id="dateBack" aria-label="اليوم السابق">‹</button>
+      <div class="datebar-center">
+        <input type="date" id="logDate" class="datebar-input">
+        <span class="datebar-hijri" id="dateWeekday"></span>
+      </div>
+      <button class="datebar-arrow" id="dateFwd" aria-label="اليوم التالي">›</button>
+      <button class="datebar-today" id="dateToday">اليوم</button>
+    </div>
+
+    <div class="log-columns">
+
+      <!-- ===================== CONSTANT COLUMN ===================== -->
+      <section class="log-col log-col-constant" aria-label="الروتين الثابت">
+        <div class="col-heading">
+          <span class="col-heading-label">الثابت يوميًا</span>
+          <span class="col-heading-en">Constants</span>
+        </div>
+
+        <div class="log-rule"></div>
+
+        <!-- DAILY DHIKR (auto, informational — not saved) -->
+        <div class="log-block">
+          <div class="dhikr-box">
+            <div class="dhikr-row">
+              <span class="dhikr-tag">ذكر اليوم</span>
+              <span class="dhikr-text" id="dhikrRotating">—</span>
+            </div>
+            <div class="dhikr-row">
+              <span class="dhikr-tag">ذكر الأسبوع</span>
+              <span class="dhikr-text" id="dhikrWeekly">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- WORSHIP -->
+        <div class="log-block">
+          <div class="log-block-title">العبادات <span class="en">Worship</span></div>
+
+          <div class="check-list">
+            <label class="check"><input type="checkbox" id="morningAdhkar"><span>أذكار الصباح</span></label>
+            <label class="check"><input type="checkbox" id="eveningAdhkar"><span>أذكار المساء</span></label>
+          </div>
+
+          <div class="sub-label">السنن الرواتب</div>
+          <div class="check-list check-list-5">
+            <label class="check sm"><input type="checkbox" id="sunnahFajr"><span>سنة الفجر</span></label>
+            <label class="check sm"><input type="checkbox" id="sunnahDhuhrBefore"><span>سنة الظهر القبلية</span></label>
+            <label class="check sm"><input type="checkbox" id="sunnahDhuhrAfter"><span>سنة الظهر البعدية</span></label>
+            <label class="check sm"><input type="checkbox" id="sunnahMaghrib"><span>سنة المغرب</span></label>
+            <label class="check sm"><input type="checkbox" id="sunnahIsha"><span>سنة العشاء</span></label>
+          </div>
+
+          <div class="sub-label">صلاة الضحى</div>
+          <div class="check-list">
+            <label class="check"><input type="checkbox" id="duhaPrayer"><span>صليت الضحى</span></label>
+          </div>
+
+          <div class="sub-label">أذكار بعد الصلاة</div>
+          <div class="check-list check-list-5">
+            <label class="check sm"><input type="checkbox" id="postPrayerFajr"><span>الفجر</span></label>
+            <label class="check sm"><input type="checkbox" id="postPrayerDhuhr"><span>الظهر</span></label>
+            <label class="check sm"><input type="checkbox" id="postPrayerAsr"><span>العصر</span></label>
+            <label class="check sm"><input type="checkbox" id="postPrayerMaghrib"><span>المغرب</span></label>
+            <label class="check sm"><input type="checkbox" id="postPrayerIsha"><span>العشاء</span></label>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="quranMinutes">القرآن — دقيقة القراءة</label>
+              <input type="number" id="quranMinutes" min="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- EXERCISE -->
+        <div class="log-block">
+          <div class="log-block-title">الرياضة <span class="en">Exercise</span></div>
+          <div class="field-row">
+            <div class="field">
+              <label for="exerciseMinutes">رياضة / مشي — دقيقة</label>
+              <input type="number" id="exerciseMinutes" min="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- MOOD -->
+        <div class="log-block">
+          <div class="log-block-title">الشعور اليوم <span class="en">Mood</span></div>
+          <div class="mood-row" id="moodRow">
+            <button class="mood-btn" data-mood="happy">سعيد</button>
+            <button class="mood-btn" data-mood="calm">مرتاح</button>
+            <button class="mood-btn" data-mood="normal">عادي</button>
+            <button class="mood-btn" data-mood="tired">متعب</button>
+            <button class="mood-btn" data-mood="stressed">متوتر</button>
+            <button class="mood-btn" data-mood="sad">حزين</button>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="log-block">
+          <div class="log-block-title">مذكرات اليوم <span class="en">Notes</span></div>
+          <textarea id="dailyNote" placeholder="شيء تريد تذكره من هذا اليوم…"></textarea>
+        </div>
+      </section>
+
+      <!-- ===================== VARIABLE COLUMN ===================== -->
+      <section class="log-col log-col-variable" aria-label="العلم والثقافة">
+        <div class="col-heading">
+          <span class="col-heading-label">العلم والثقافة اليوم</span>
+          <span class="col-heading-en">Learning</span>
+        </div>
+
+        <div class="log-rule accent"></div>
+
+        <!-- ENGLISH -->
+        <div class="log-block">
+          <div class="log-block-title">الإنجليزية <span class="en">English</span></div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="englishMinutes">ساعات التعلم — دقيقة</label>
+              <input type="number" id="englishMinutes" min="0" placeholder="0">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="englishWords">الكلمات التي تعلمتها اليوم</label>
+              <textarea id="englishWords" class="short" placeholder="كلمة — معنى، كلمة — معنى…"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- DEVOPS TRACKS (dynamic, built from active plan) -->
+        <div class="log-block">
+          <div class="log-block-title">مسارات DevOps <span class="en">Tracks</span></div>
+          <div id="tracksContainer" class="tracks-container">
+            <div class="empty-hint">لا توجد خطة أسبوع نشطة. اذهب إلى «خطة الأسبوع» وارفع ملف JSON.</div>
+          </div>
+        </div>
+
+        <!-- PODCAST -->
+        <div class="log-block">
+          <div class="log-block-title">بودكاست / محاضرة <span class="en">Podcast</span></div>
+          <div class="field-row two">
+            <div class="field">
+              <label for="podcastName">الاسم أو الموضوع</label>
+              <input type="text" id="podcastName" placeholder="مثال: نظام إدارة الوقت">
+            </div>
+            <div class="field">
+              <label for="podcastMinutes">المدة — دقيقة</label>
+              <input type="number" id="podcastMinutes" min="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- READING -->
+        <div class="log-block">
+          <div class="log-block-title">القراءة <span class="en">Reading</span></div>
+          <div class="field-row two">
+            <div class="field">
+              <label for="readingName">اسم الكتاب</label>
+              <input type="text" id="readingName" placeholder="اسم الكتاب">
+            </div>
+            <div class="field">
+              <label for="readingPages">عدد الصفحات</label>
+              <input type="number" id="readingPages" min="0" placeholder="0">
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="save-bar">
+      <div class="save-status" id="saveStatus"></div>
+      <button class="btn-save" id="saveDayBtn">حفظ اليوم</button>
+    </div>
+
+    </section>
+
+    <!-- ===================== SUBTAB: WEEKLY PLAN ===================== -->
+    <section class="subtab-panel" id="subtab-plan" data-group="tracking">
+
+    <div class="section-header">
+      <h2>خطة الأسبوع الحالي</h2>
+      <p class="section-sub">الخطة يضعها الموجّه (Claude) بناءً على تقرير الأسبوع الماضي — تُرفع هنا كملف JSON.</p>
+    </div>
+
+    <div class="plan-weekbar">
+      <button class="datebar-arrow" id="planWeekBack">‹</button>
+      <div class="plan-weekbar-label" id="planWeekLabel">—</div>
+      <button class="datebar-arrow" id="planWeekFwd">›</button>
+    </div>
+
+    <div id="planDisplay" class="plan-display"></div>
+
+    <div class="plan-actions">
+      <label class="btn-outline file-btn">
+        رفع خطة JSON
+        <input type="file" id="planFileInput" accept="application/json,.json" hidden>
+      </label>
+      <button class="btn-outline" id="downloadTemplateBtn">تحميل قالب فارغ</button>
+      <button class="btn-outline danger" id="clearPlanBtn">حذف خطة هذا الأسبوع</button>
+    </div>
+
+    </section>
+
+    <!-- ===================== SUBTAB: WEEKLY DASHBOARD ===================== -->
+    <section class="subtab-panel" id="subtab-dashboard" data-group="tracking">
+
+    <div class="section-header">
+      <h2>لوحة الأسبوع</h2>
+      <p class="section-sub">قياس التنفيذ الفعلي مقابل الخطة — الاستمرارية أهم من الاكتمال.</p>
+    </div>
+
+    <div class="plan-weekbar">
+      <button class="datebar-arrow" id="dashWeekBack">‹</button>
+      <div class="plan-weekbar-label" id="dashWeekLabel">—</div>
+      <button class="datebar-arrow" id="dashWeekFwd">›</button>
+    </div>
+
+    <div class="stat-grid" id="statGrid"></div>
+
+    <div class="dash-block">
+      <div class="dash-block-title">تقدّم المسارات</div>
+      <div id="trackProgress" class="track-progress"></div>
+    </div>
+
+    <div class="dash-block">
+      <div class="dash-block-title">جدول التنفيذ اليومي</div>
+      <div class="table-scroll">
+        <table id="weekTable" class="week-table"></table>
+      </div>
+    </div>
+
+    <div class="dash-block">
+      <div class="dash-block-title">مراجعة الأسبوع</div>
+      <div class="review-grid">
+        <div class="review-field">
+          <label for="reviewWins">ماذا أنجزت هذا الأسبوع؟</label>
+          <textarea id="reviewWins"></textarea>
+        </div>
+        <div class="review-field">
+          <label for="reviewLearned">ما الذي تعلمته؟</label>
+          <textarea id="reviewLearned"></textarea>
+        </div>
+        <div class="review-field">
+          <label for="reviewProblems">ما الذي أعاقني؟</label>
+          <textarea id="reviewProblems"></textarea>
+        </div>
+        <div class="review-field">
+          <label for="reviewContinue">ما الذي أريد الاستمرار عليه؟</label>
+          <textarea id="reviewContinue"></textarea>
+        </div>
+        <div class="review-field">
+          <label for="reviewChange">ما الذي سأغيره الأسبوع القادم؟</label>
+          <textarea id="reviewChange"></textarea>
+        </div>
+        <div class="review-field">
+          <label for="reviewMemory">ملاحظة لنفسي في المستقبل</label>
+          <textarea id="reviewMemory"></textarea>
+        </div>
+      </div>
+      <div class="save-bar inline">
+        <div class="save-status" id="reviewSaveStatus"></div>
+        <button class="btn-save" id="saveReviewBtn">حفظ مراجعة الأسبوع</button>
+      </div>
+    </div>
+
+    <div class="dash-block">
+      <div class="dash-block-title">تصدير التقرير الأسبوعي</div>
+      <p class="section-sub">ملف واحد يجمع ملخصًا نصيًا مقروءًا وبيانات JSON دقيقة — جاهز لإرساله للمراجعة.</p>
+      <div class="plan-actions">
+        <button class="btn-outline" id="exportWeekBtn">تصدير تقرير الأسبوع</button>
+        <button class="btn-outline" id="exportAllBtn">تصدير نسخة كاملة (Backup)</button>
+      </div>
+    </div>
+
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       SECTION 2 — المالية (Finance): fixed balance strip, then
+       one flat row of 5 tabs — same pattern as صفحة المتابعة.
+  ============================================================ -->
+  <main class="page" id="page-finance">
+
+    <div class="section-header">
+      <h2>المالية</h2>
+      <p class="section-sub">الرصيد يتحدّث تلقائيًا مع كل عملية.</p>
+    </div>
+
+    <!-- ===================== FIXED BALANCE STRIP (no tab) ===================== -->
+    <section class="fin-section" aria-label="الرصيد">
+
+      <div class="total-balance-strip">
+        <div class="bank-strip-label">الرصيد الكلي (البنك + الجيب)</div>
+        <div class="bank-strip-value" id="totalBalanceValue">—</div>
+      </div>
+
+      <div class="balance-pair">
+        <div class="balance-card">
+          <div class="bank-strip-label">رصيد البنك</div>
+          <div class="bank-strip-value" id="bankBalanceValue">—</div>
+          <button class="btn-outline" id="bankInitBtn">تعيين الرصيد الابتدائي</button>
+        </div>
+        <div class="balance-transfer">
+          <button class="btn-outline" id="transferToPocketBtn" title="تحويل من البنك للجيب">البنك ← الجيب</button>
+          <button class="btn-outline" id="transferToBankBtn" title="تحويل من الجيب للبنك">الجيب ← البنك</button>
+        </div>
+        <div class="balance-card">
+          <div class="bank-strip-label">رصيد الجيب</div>
+          <div class="bank-strip-value" id="pocketBalanceValue">—</div>
+          <p class="section-sub" style="margin-top:6px;">كل المصاريف تُخصم من هنا</p>
+        </div>
+      </div>
+
+    </section>
+
+    <nav class="subtabs" aria-label="تبويبات المالية" data-group="finance">
+      <button class="subtab-btn active" data-subtab="fin-daily">يومية</button>
+      <button class="subtab-btn" data-subtab="fin-monthly">شهرية</button>
+      <button class="subtab-btn" data-subtab="fin-income">الإيرادات</button>
+      <button class="subtab-btn" data-subtab="fin-board">اللوحة</button>
+      <button class="subtab-btn" data-subtab="fin-reports">التقارير</button>
+    </nav>
+
+    <!-- DAILY EXPENSES -->
+    <section class="subtab-panel active" id="subtab-fin-daily" data-group="finance">
+      <div class="dash-block">
+        <div class="log-datebar">
+          <button class="datebar-arrow" id="finDateBack" aria-label="اليوم السابق">‹</button>
+          <div class="datebar-center">
+            <input type="date" id="finDate" class="datebar-input">
+            <span class="datebar-hijri" id="finDateWeekday"></span>
+          </div>
+          <button class="datebar-arrow" id="finDateFwd" aria-label="اليوم التالي">›</button>
+          <button class="datebar-today" id="finDateToday">اليوم</button>
+        </div>
+
+        <div class="field-row finance-grid" id="dailyExpenseGrid"></div>
+
+        <div class="finance-add-row">
+          <button class="btn-outline" id="addDailyCategoryBtn">+ إضافة بند يومي</button>
+        </div>
+
+        <div class="save-bar inline">
+          <div class="save-status" id="finDailyStatus"></div>
+          <button class="btn-save" id="saveDailyExpBtn">حفظ مصاريف اليوم</button>
+        </div>
+
+        <div id="finDailyHistory"></div>
+      </div>
+    </section>
+
+    <!-- MONTHLY EXPENSES -->
+    <section class="subtab-panel" id="subtab-fin-monthly" data-group="finance">
+      <div class="dash-block">
+        <p class="section-sub">فواتير ومصاريف ثابتة تُدخل يدويًا كل شهر (بما فيها «مصروف ختام» — وهو مصروف يُخصم من الرصيد، وليس دخلًا).</p>
+
+        <div class="plan-weekbar">
+          <button class="datebar-arrow" id="finMonthBack">‹</button>
+          <div class="plan-weekbar-label" id="finMonthLabel">—</div>
+          <button class="datebar-arrow" id="finMonthFwd">›</button>
+        </div>
+
+        <div class="field-row finance-grid" id="monthlyExpenseGrid"></div>
+
+        <div class="finance-add-row">
+          <button class="btn-outline" id="addMonthlyCategoryBtn">+ إضافة بند شهري</button>
+        </div>
+
+        <div class="save-bar inline">
+          <div class="save-status" id="finMonthlyStatus"></div>
+          <button class="btn-save" id="saveMonthlyExpBtn">حفظ مصاريف الشهر</button>
+        </div>
+
+        <div id="finMonthlyHistory"></div>
+      </div>
+    </section>
+
+    <!-- INCOME -->
+    <section class="subtab-panel" id="subtab-fin-income" data-group="finance">
+      <div class="dash-block">
+        <div class="dash-block-title">تسجيل إيراد</div>
+        <p class="section-sub">كل دخل — راتب، عمل حر، بيع، هدية، أي شيء — يُسجَّل هنا بمبلغ وتاريخ وسبب حر.</p>
+
+        <div class="field-row two">
+          <div class="field">
+            <label for="incomeAmount">المبلغ</label>
+            <input type="number" id="incomeAmount" min="0" step="0.01" placeholder="0">
+          </div>
+          <div class="field">
+            <label for="incomeDate">التاريخ</label>
+            <input type="date" id="incomeDate">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="incomeReason">السبب</label>
+            <input type="text" id="incomeReason" placeholder="مثال: راتب الشهر، عمل حر، بيع غرض، هدية…">
+          </div>
+        </div>
+        <div class="save-bar inline">
+          <div class="save-status" id="incomeStatus"></div>
+          <button class="btn-save" id="addIncomeBtn">إضافة إيراد</button>
+        </div>
+
+        <div id="incomeList" class="income-list"></div>
+      </div>
+    </section>
+
+    <!-- BOARD (breakdown + week table) -->
+    <section class="subtab-panel" id="subtab-fin-board" data-group="finance">
+      <div class="stat-grid" id="financeStatGrid"></div>
+
+      <div class="dash-block">
+        <div class="dash-block-title">توزيع المصاريف اليومية</div>
+        <div class="plan-weekbar">
+          <button class="datebar-arrow" id="finWeekBack">‹</button>
+          <div class="plan-weekbar-label" id="finWeekLabel">—</div>
+          <button class="datebar-arrow" id="finWeekFwd">›</button>
+        </div>
+        <div id="financeBreakdown" class="track-progress"></div>
+      </div>
+
+      <div class="dash-block">
+        <div class="dash-block-title">جدول المصاريف اليومية — الأسبوع المعروض</div>
+        <div class="table-scroll">
+          <table id="financeWeekTable" class="week-table"></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="subtab-panel" id="subtab-fin-reports" data-group="finance">
+      <div class="dash-block">
+        <div class="dash-block-title">تقرير الأسبوع الحالي</div>
+        <p class="section-sub">يغطي الأسبوع المعروض في لوحة المؤشرات أعلاه (سبت ← جمعة): <span id="reportWeekRangeLabel">—</span>.</p>
+        <div class="plan-actions">
+          <button class="btn-outline" id="exportFinanceWeekBtn">تحميل تقرير الأسبوع (JSON)</button>
+          <button class="btn-outline" id="exportFinanceWeekExcelBtn">تحميل تقرير الأسبوع (Excel)</button>
+        </div>
+      </div>
+
+      <div class="dash-block">
+        <div class="dash-block-title">تقرير شهر مُختار</div>
+        <p class="section-sub">اختر أي شهر — يغطي كل أيامه من 1 حتى آخر يوم، مع الفواتير والمصروفات الشهرية وكل الإيرادات لنفس الشهر.</p>
+        <div class="plan-weekbar">
+          <button class="datebar-arrow" id="reportMonthBack">‹</button>
+          <div class="plan-weekbar-label" id="reportMonthLabel">—</div>
+          <button class="datebar-arrow" id="reportMonthFwd">›</button>
+        </div>
+        <div class="plan-actions">
+          <button class="btn-outline" id="exportFinanceMonthBtn">تحميل تقرير الشهر المختار (JSON)</button>
+          <button class="btn-outline" id="exportFinanceMonthExcelBtn">تحميل تقرير الشهر المختار (Excel)</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
