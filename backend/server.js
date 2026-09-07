@@ -28,6 +28,44 @@ const path = require("path");
 const app = express();
 app.use(express.json({ limit: "5mb" }));
 
+const client = require("prom-client");
+
+// يجمع مقاييس افتراضية عن عملية Node.js نفسها (استخدام الذاكرة،
+// الـ event loop lag، عدد الـ garbage collections، إلخ) — تلقائيًا
+client.collectDefaultMetrics();
+
+// Counter: إجمالي عدد طلبات HTTP، مصنّفة حسب الطريقة والمسار والحالة
+const httpRequestCounter = new client.Counter({
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "status_code"],
+});
+
+// Histogram: مدة كل طلب بالثواني
+const httpRequestDuration = new client.Histogram({
+  name: "http_request_duration_seconds",
+  help: "Duration of HTTP requests in seconds",
+  labelNames: ["method", "route", "status_code"],
+  buckets: [0.01, 0.05, 0.1, 0.3, 0.5, 1, 2, 5],
+});
+
+// Middleware: يسجّل كل طلب تلقائيًا، بدون تعديل أي route موجود
+app.use((req, res, next) => {
+  const end = httpRequestDuration.startTimer();
+  res.on("finish", () => {
+    const route = req.route ? req.route.path : req.path;
+    const labels = { method: req.method, route, status_code: res.statusCode };
+    httpRequestCounter.inc(labels);
+    end(labels);
+  });
+  next();
+});
+
+// Endpoint الذي سيقرأه Prometheus
+app.get("/metrics", async (req, res) => {
+  res.set("Content-Type", client.register.contentType);
+  res.end(await client.register.metrics());
+});
 // ---------------------------------------------------------------
 // Data directory resolution
 // ---------------------------------------------------------------
