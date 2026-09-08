@@ -24,3 +24,25 @@ services:
       backend:
         condition: service_healthy
     restart: unless-stopped
+
+  # ---------------------------------------------------------------
+  # Prometheus — يجمع (scrape) المقاييس من backend:8080/metrics كل
+  # 15 ثانية (راجع prometheus.yml) ويخزّنها كسلاسل زمنية. لا يحتاج
+  # Dockerfile خاص — صورة رسمية جاهزة من Docker Hub.
+  # ---------------------------------------------------------------
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      # نمرّر ملف الإعداد كـ read-only bind mount. القراءة فقط (:ro)
+      # مقصودة: Prometheus لا يحتاج ولا يجب أن يعدّل هذا الملف أبدًا.
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      # منفذ 9090 هو واجهة Prometheus نفسها (استعلامات PromQL يدوية،
+      # فحص حالة الـ targets). نفتحه للخارج مؤقتًا للمراقبة اليدوية
+      # أثناء التعلّم؛ لاحقًا مع Grafana قد لا تحتاج فتحه للجمهور.
+      - "9090:9090"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

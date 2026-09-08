@@ -1,0 +1,29 @@
+# =================================================================
+# prometheus.yml — إعداد Prometheus
+# -----------------------------------------------------------------
+# هذا الملف يخبر Prometheus: (1) كل قد إيش يجمع البيانات (scrape
+# interval)، و (2) من وين يجمعها (targets). Prometheus هو من يطلب
+# البيانات (pull) من الـ backend، وليس العكس — راجع الشرح بالمحادثة.
+# =================================================================
+
+global:
+  # كل 15 ثانية، Prometheus يزور كل target معرّف تحت ويسحب /metrics
+  # منه. هذا الإعداد الافتراضي المعقول لمعظم الحالات؛ قيمة أقل
+  # (مثلاً 5s) تعطي دقة أعلى لكن حمل أكبر على الشبكة والتخزين —
+  # غير مبرر لمشروع شخصي بحجم هذا.
+  scrape_interval: 15s
+
+  # لو target ما ردّ خلال هذه المدة، يُعتبر scrape فاشل لتلك الجولة
+  # (يظهر كـ "down" بحالة الـ target، لا يوقف Prometheus نفسه)
+  scrape_timeout: 10s
+
+scrape_configs:
+  # job_name هو مجرد تسمية منطقية تظهر كـ label (job="tracker-backend")
+  # على كل metric مسحوب من هذا الهدف — يفيدك لاحقًا لو أضفت أهداف
+  # أخرى (frontend, node-exporter, ...) وتبغى تميّز بينها بالاستعلام.
+  - job_name: "tracker-backend"
+    static_configs:
+      # "backend" هنا هو اسم الـ service بـ docker-compose.yml، وليس
+      # localhost — Docker's internal DNS يحل هذا الاسم فقط عندما
+      # يكون هذا الـ container على نفس network مع backend.
+      - targets: ["backend:8080"]
